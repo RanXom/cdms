@@ -6,7 +6,7 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cdms
       - SPRING_DATASOURCE_USERNAME=cdms_user
-      - SPRING_DATASOURCE_SECRET=secret
+      - SPRING_DATASOURCE_PASSWORD=secret
       - SPRING_REDIS_HOST=redis
     ports:
       - "8080:8080"
