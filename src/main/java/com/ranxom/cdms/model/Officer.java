@@ -7,30 +7,30 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Data
-@Table(name="officers")
+@Table(name = "officers")
 public class Officer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="officers_id")
-    private Integer id;
+    @Column(name = "officers_id")
+    private Integer officersId;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="badge_number")
+    @Column(name = "badge_number")
     private String badgeNumber;
 
-    @Column(name="rank")
+    @Column(name = "rank")
     private String rank;
 
-    @Column(name="department")
+    @Column(name = "department")
     private String department;
 
-    @Column(name="contact", columnDefinition="jsonb")
+    @Column(name = "contact", columnDefinition="jsonb")
     private String contact;
 
-    @Column(name="created_at", columnDefinition="TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", columnDefinition="TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private OffsetDateTime createdAt;
 
     @PrePersist

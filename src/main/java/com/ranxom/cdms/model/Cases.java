@@ -7,40 +7,40 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Data
-@Table(name="cases")
+@Table(name = "cases")
 public class Cases {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="case_id")
+    @Column(name = "case_id")
     private Integer caseId;
 
-    @Column(name="title")
+    @Column(name = "title")
     private String title;
 
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
 
-    @Column(name="case_type")
+    @Column(name = "case_type")
     private String caseType;
 
-    @Column(name="status", nullable = false)
+    @Column(name = "status", nullable = false)
     private String status = "open";
 
-    @Column(name="reported_at")
+    @Column(name = "reported_at")
     private OffsetDateTime reportedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="lead_officer_id", referencedColumnName="officers_id")
+    @JoinColumn(name = "lead_officer_id", referencedColumnName = "officers_id")
     private Officer leadOfficer;
 
-    @Column(name="created_at", columnDefinition="TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", columnDefinition="TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
     private OffsetDateTime createdAt;
 
-    @Column(name="location")
+    @Column(name = "location")
     private String location;
 
-    @Column(name="severity")
+    @Column(name = "severity")
     private String severity;
 
     @PrePersist
