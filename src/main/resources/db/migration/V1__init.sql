@@ -9,7 +9,7 @@ CREATE TABLE roles (
 
 -- Users table for authentication and linking activity
 CREATE TABLE users (
-                       id SERIAL PRIMARY KEY,
+                       id BIGSERIAL PRIMARY KEY,
                        username TEXT NOT NULL UNIQUE,
                        password_hash TEXT NOT NULL,
                        salt TEXT NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE users (
 
 -- Officers table
 CREATE TABLE officers (
-                          officers_id SERIAL PRIMARY KEY,
+                          officers_id BIGSERIAL PRIMARY KEY,
                           name TEXT NOT NULL,
                           badge_number TEXT NOT NULL UNIQUE,
                           rank TEXT,
@@ -32,13 +32,13 @@ CREATE TABLE officers (
 
 -- Cases table, the central entity
 CREATE TABLE cases (
-                       case_id SERIAL PRIMARY KEY,
+                       case_id BIGSERIAL PRIMARY KEY,
                        title TEXT NOT NULL,
                        description TEXT,
                        case_type TEXT,
                        status TEXT NOT NULL DEFAULT 'open',
                        reported_at TIMESTAMP WITH TIME ZONE,
-                       lead_officer_id INT REFERENCES officers(officers_id),
+                       lead_officer_id BIGINT REFERENCES officers(officers_id),
                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                        location TEXT,
                        severity TEXT
@@ -46,7 +46,7 @@ CREATE TABLE cases (
 
 -- Persons table (suspects, victims, witnesses)
 CREATE TABLE persons (
-                         persons_id SERIAL PRIMARY KEY,
+                         persons_id BIGSERIAL PRIMARY KEY,
                          name TEXT NOT NULL,
                          dob DATE,
                          roles TEXT[],
@@ -56,36 +56,36 @@ CREATE TABLE persons (
 
 -- case_participants (Join table for cases and persons)
 CREATE TABLE case_participants (
-                                   case_id INT NOT NULL REFERENCES cases(case_id),
-                                   person_id INT NOT NULL REFERENCES persons(persons_id),
+                                   case_id BIGINT NOT NULL REFERENCES cases(case_id),
+                                   person_id BIGINT NOT NULL REFERENCES persons(persons_id),
                                    role_in_case TEXT,
                                    PRIMARY KEY (case_id, person_id)
 );
 
 -- Attachments (reports, documents)
 CREATE TABLE attachments (
-                             attachment_id SERIAL PRIMARY KEY,
+                             attachment_id BIGSERIAL PRIMARY KEY,
                              filename TEXT NOT NULL,
                              url TEXT NOT NULL,
                              checksum TEXT,
-                             uploaded_by INT REFERENCES users(id),
-                             case_id INT NOT NULL REFERENCES cases(case_id)
+                             uploaded_by BIGINT REFERENCES users(id),
+                             case_id BIGINT NOT NULL REFERENCES cases(case_id)
 );
 
 -- case_notes (running log for a case)
 CREATE TABLE case_notes (
-                            note_id SERIAL PRIMARY KEY,
-                            author_id INT REFERENCES users(id),
+                            note_id BIGSERIAL PRIMARY KEY,
+                            author_id BIGINT REFERENCES users(id),
                             content TEXT,
                             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                            case_id INT NOT NULL REFERENCES cases(case_id)
+                            case_id BIGINT NOT NULL REFERENCES cases(case_id)
 );
 
 -- investigation_instances
 CREATE TABLE investigation_instances (
                                          year INT NOT NULL,
                                          quarter INT NOT NULL,
-                                         case_id INT NOT NULL REFERENCES cases(case_id),
+                                         case_id BIGINT NOT NULL REFERENCES cases(case_id),
                                          started_at TIMESTAMP WITH TIME ZONE,
                                          closed_at TIMESTAMP WITH TIME ZONE,
                                          PRIMARY KEY (year, quarter, case_id)
@@ -93,8 +93,8 @@ CREATE TABLE investigation_instances (
 
 -- evidence (physical, digital)
 CREATE TABLE evidence (
-                          evidence_id SERIAL PRIMARY KEY,
-                          case_id INT NOT NULL REFERENCES cases(case_id),
+                          evidence_id BIGSERIAL PRIMARY KEY,
+                          case_id BIGINT NOT NULL REFERENCES cases(case_id),
                           type TEXT,
                           metadata JSONB,
                           stored_at TEXT,

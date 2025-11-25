@@ -13,7 +13,7 @@ public class Cases {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "case_id")
-    private Integer caseId;
+    private Long caseId;
 
     @Column(name = "title")
     private String title;
