@@ -140,19 +140,10 @@ CREATE INDEX idx_audit_logs_entity_type_id ON audit_logs(entity_type, entity_id)
 -- ===============================
 
 -- Roles
-INSERT INTO roles (role_name, permissions)
-VALUES
-    ('ADMIN', '{}'),
-    ('SUPERVISOR', '{}'),
-    ('OFFICER', '{}');
-
--- Users
-INSERT INTO users (username, password_hash, email, role)
-VALUES
-    ('admin', 'hash1', 'admin@cdms.local', 'ADMIN'),
-    ('supervisor', 'hash2', 'supervisor@cdms.local', 'SUPERVISOR'),
-    ('officer1', 'hash3', 'officer1@cdms.local', 'OFFICER'),
-    ('officer2', 'hash4', 'officer2@cdms.local', 'OFFICER');
+INSERT INTO roles (role_name, permissions) VALUES
+   ('ADMIN', '{"read": true, "write": true, "delete": true}'::jsonb),
+   ('USER', '{"read": true, "write": false, "delete": false}'::jsonb),
+   ('OFFICER', '{"read": true, "write": true, "delete": false}'::jsonb);
 
 -- Officers
 INSERT INTO officers (name, badge_number, rank, department, contact)
