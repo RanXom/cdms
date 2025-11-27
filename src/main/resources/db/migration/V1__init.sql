@@ -12,7 +12,6 @@ CREATE TABLE users (
                        id BIGSERIAL PRIMARY KEY,
                        username TEXT NOT NULL UNIQUE,
                        password_hash TEXT NOT NULL,
-                       salt TEXT NOT NULL,
                        email TEXT NOT NULL UNIQUE,
                        role TEXT REFERENCES roles(role_name),
                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
