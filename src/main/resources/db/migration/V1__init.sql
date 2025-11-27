@@ -1,13 +1,17 @@
 -- V1__Init_Schema.sql
--- This script creates the initial database schema based on the project ER diagram.
+-- Initial schema setup + base seed data
 
--- Roles table for Role-Based Access Control (RBAC)
+-- ===============================
+-- 📌 TABLES
+-- ===============================
+
+-- Roles table for RBAC
 CREATE TABLE roles (
                        role_name TEXT PRIMARY KEY,
                        permissions JSONB
 );
 
--- Users table for authentication and linking activity
+-- Users table
 CREATE TABLE users (
                        id BIGSERIAL PRIMARY KEY,
                        username TEXT NOT NULL UNIQUE,
@@ -29,7 +33,7 @@ CREATE TABLE officers (
                           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Cases table, the central entity
+-- Cases table
 CREATE TABLE cases (
                        case_id BIGSERIAL PRIMARY KEY,
                        title TEXT NOT NULL,
@@ -43,7 +47,7 @@ CREATE TABLE cases (
                        severity TEXT
 );
 
--- Persons table (suspects, victims, witnesses)
+-- Persons table
 CREATE TABLE persons (
                          persons_id BIGSERIAL PRIMARY KEY,
                          name TEXT NOT NULL,
@@ -53,7 +57,7 @@ CREATE TABLE persons (
                          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- case_participants (Join table for cases and persons)
+-- Case participants
 CREATE TABLE case_participants (
                                    case_id BIGINT NOT NULL REFERENCES cases(case_id),
                                    person_id BIGINT NOT NULL REFERENCES persons(persons_id),
@@ -61,7 +65,7 @@ CREATE TABLE case_participants (
                                    PRIMARY KEY (case_id, person_id)
 );
 
--- Attachments (reports, documents)
+-- Attachments
 CREATE TABLE attachments (
                              attachment_id BIGSERIAL PRIMARY KEY,
                              filename TEXT NOT NULL,
@@ -71,7 +75,7 @@ CREATE TABLE attachments (
                              case_id BIGINT NOT NULL REFERENCES cases(case_id)
 );
 
--- case_notes (running log for a case)
+-- Case notes
 CREATE TABLE case_notes (
                             note_id BIGSERIAL PRIMARY KEY,
                             author_id BIGINT REFERENCES users(id),
@@ -80,7 +84,7 @@ CREATE TABLE case_notes (
                             case_id BIGINT NOT NULL REFERENCES cases(case_id)
 );
 
--- investigation_instances
+-- Investigation instances
 CREATE TABLE investigation_instances (
                                          year INT NOT NULL,
                                          quarter INT NOT NULL,
@@ -90,7 +94,7 @@ CREATE TABLE investigation_instances (
                                          PRIMARY KEY (year, quarter, case_id)
 );
 
--- evidence (physical, digital)
+-- Evidence
 CREATE TABLE evidence (
                           evidence_id BIGSERIAL PRIMARY KEY,
                           case_id BIGINT NOT NULL REFERENCES cases(case_id),
@@ -101,7 +105,7 @@ CREATE TABLE evidence (
                           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- audit_logs for immutable tracking
+-- Audit logs
 CREATE TABLE audit_logs (
                             audit_id BIGSERIAL PRIMARY KEY,
                             entity_type TEXT,
@@ -112,26 +116,56 @@ CREATE TABLE audit_logs (
                             diff JSONB
 );
 
--- ### INDEXES ###
--- Add indexes for common query fields and foreign keys for performance
+-- ===============================
+-- 📌 INDEXES
+-- ===============================
 
--- Cases
 CREATE INDEX idx_cases_status ON cases(status);
 CREATE INDEX idx_cases_lead_officer_id ON cases(lead_officer_id);
 
--- Persons
 CREATE INDEX idx_persons_name ON persons(name);
 CREATE INDEX idx_persons_roles ON persons USING GIN(roles);
 
--- Evidence
 CREATE INDEX idx_evidence_case_id ON evidence(case_id);
 CREATE INDEX idx_evidence_metadata ON evidence USING GIN(metadata);
 
--- Attachments
 CREATE INDEX idx_attachments_case_id ON attachments(case_id);
 
--- Case Notes
 CREATE INDEX idx_case_notes_case_id ON case_notes(case_id);
 
--- Audit Logs
 CREATE INDEX idx_audit_logs_entity_type_id ON audit_logs(entity_type, entity_id);
+
+-- ===============================
+-- 🚀 SEED DATA INSERTION
+-- ===============================
+
+-- Roles
+INSERT INTO roles (role_name, permissions)
+VALUES
+    ('ADMIN', '{}'),
+    ('SUPERVISOR', '{}'),
+    ('OFFICER', '{}');
+
+-- Users
+INSERT INTO users (username, password_hash, email, role)
+VALUES
+    ('admin', 'hash1', 'admin@cdms.local', 'ADMIN'),
+    ('supervisor', 'hash2', 'supervisor@cdms.local', 'SUPERVISOR'),
+    ('officer1', 'hash3', 'officer1@cdms.local', 'OFFICER'),
+    ('officer2', 'hash4', 'officer2@cdms.local', 'OFFICER');
+
+-- Officers
+INSERT INTO officers (name, badge_number, rank, department, contact)
+VALUES
+    ('Akhil Singh', 'B001', 'Inspector', 'Cyber Crime', '{"phone": "111-111"}'),
+    ('Nina Kapoor', 'B002', 'Sub-Inspector', 'Robbery', '{"phone": "222-222"}');
+
+-- Cases
+INSERT INTO cases (title, description, case_type, status, reported_at, lead_officer_id, location, severity)
+VALUES
+    ('ATM Skimming Operation', 'Multiple ATM machines compromised using skimming devices.', 'HOMICIDE', 'under_investigation', NOW() - INTERVAL '3 days', 1, 'Sector 18, Noida', 'HIGH'),
+    ('Illegal Arms Shipment', 'Suspicious cargo container found with illegal firearms.', 'OTHER', 'under_investigation', NOW() - INTERVAL '7 days', 2, 'Nhava Sheva Port, Mumbai', 'CRITICAL'),
+    ('Kidnapping Case', 'Young boy reported missing from neighborhood.', 'HOMICIDE', 'open', NOW() - INTERVAL '2 days', 1, 'Dwarka, Delhi', 'HIGH'),
+    ('Diamond Heist', 'High-profile robbery at luxury jewellery showroom.', 'FRAUD', 'closed', NOW() - INTERVAL '14 days', 2, 'Bandra, Mumbai', 'CRITICAL'),
+    ('Stolen Bike', 'Motorbike reported stolen outside a metro station.', 'THEFT', 'closed', NOW() - INTERVAL '5 days', 1, 'Rajouri Garden, Delhi', 'MEDIUM'),
+    ('Credit Card Fraud', 'Multiple unauthorized transactions reported.', 'OTHER', 'closed', NOW() - INTERVAL '1 day', 2, 'Online', 'LOW');
