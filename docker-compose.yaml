@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: ranxom/cdms-backend:latest
     container_name: cdms_app
     environment:
       - SPRING_PROFILES_ACTIVE=dev
@@ -13,6 +13,15 @@ services:
     depends_on:
       - db
       - redis
+    restart: always
+
+  frontend:
+    image: ranxom/cdms-frontend:latest
+    container_name: cdms_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
     restart: always
 
   db:
